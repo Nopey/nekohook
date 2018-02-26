@@ -9,6 +9,10 @@
 cmake_minimum_required (VERSION 2.6)
 project (libnekohook)
 
+# Allows us to use cmake/FindSDL2.cmake
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+
 ## Defaults
 # User options can be set with cmake -D"NAME OF OPTION HERE"="VARIABLE", e.g. "cmake -DCGAME=csgo"
 set(CGAME tf2 CACHE STRING "Game to build with")
@@ -109,9 +113,12 @@ if(CBASE STREQUAL "SOURCE_2013_SDK")
   list(APPEND SOURCE_FILES ${TMP_SOURCES}) # add our source sdk files
   set(SSDK_DIR "${CMAKE_SOURCE_DIR}/src/modules/Source_2013/sdk/mp/src")
 	if(EXISTS ${SSDK_DIR})
-		message(STATUS "Careful now, You're using Nopey's Hacky Version of SSDK.")
-		add_definitions("-DLINUX=1 -D_LINUX=1 -D_POSIX=1 -DPOSIX=1 -DUSE_SDL=1 -DGNUC=1 -DENABLE_IPC=1")
+		message(STATUS "Careful now, You're using Nopey's FOSS knockoff SSDK, and if you don't know what those acronyms mean, you won't be able to use this..")
+		add_definitions(-DCATHOOK_SOURCE_2013=1 -DUSE_SDL=1 -D_GLIBCXX_USE_CXX11_ABI=0 -D_POSIX=1 -DRAD_TELEMETRY_DISABLED=1 -DLINUX=1 -D_LINUX=1 -DPOSIX=1 -DGNUC=1 -DNO_MALLOC_OVERRIDE=1)
 		include_directories(SYSTEM ${SSDK_DIR} ${SSDK_DIR}/common ${SSDK_DIR}/public ${SSDK_DIR}/public/mathlib ${SSDK_DIR}/public/tier0 ${SSDK_DIR}/public/tier1 ${SSDK_DIR}/game/shared ${SSDK_DIR}/game/server)
+		list(APPEND LINK_LIBRARIES $ENV{HOME}/.steam/steam/steamapps/common/Team\ Fortress\ 2/bin/libSDL2-2.0.so.0)
+		message(${SDL2_INCLUDE_DIR})
+		include_directories(SYSTEM ${SDL2_INCLUDE_DIR})
   endif()
 
 endif()

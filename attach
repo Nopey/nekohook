@@ -9,12 +9,12 @@ fi
 
 if [ ${#arr[@]} == 0 ]; then
   echo TF2 isn\'t running!
-  exit
+  exit 1
 fi
 
 if [ $inst -gt ${#arr[@]} ] || [ $inst == ${#arr[@]} ]; then
   echo wrong index!
-  exit
+  exit 1
 fi
 
 proc=${arr[$inst]}

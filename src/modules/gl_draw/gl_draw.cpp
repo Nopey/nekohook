@@ -14,15 +14,13 @@ extern "C"{
 #include "libglez/include/glez.h" // Include the lib_glez for easy open gl drawing ;)
 }
 #include "gl_draw.hpp"
+#include <GL/glew.h>
+#include <iostream>
 namespace modules { namespace gl_draw {
 
 // Convert frameworks colors into glez colors
 static inline glez_rgba_t convert(CatVector4 in) {
-  glez_rgba_t out;
-  out.r=in.x;
-  out.g=in.y;
-  out.b=in.z;
-  out.a=in.a;
+  return {in.x,in.y,in.z,in.a};
 }
 
 // Font system, We only use 12 fonts to save on memory
@@ -50,6 +48,13 @@ static inline glez_rgba_t convert(CatVector4 in) {
 
 // Run to init glez
 void Init() {
+  glewExperimental = GL_TRUE;
+  auto error = glewInit();
+  glClearColor(1.0, 0.0, 0.0, 0.5);
+  if (GLEW_OK != error){
+    std::cerr<<"Error Initializing GLEW for gl_draw: "<<glewGetErrorString(error)<<std::endl;
+    return;
+  }
 
   // Setup glez
   glez_init(input::bounds.first, input::bounds.second);
@@ -57,7 +62,9 @@ void Init() {
   // Glez draw before
   static auto last_bounds = input::bounds;
   drawmgr.REventBefore([](){
-
+    //TODO: Detect Screen Resolution
+    input::bounds.first=1920;
+    input::bounds.second=1080;
     // If our last bounds changed, we need to let glez know about the change
     if (last_bounds != input::bounds) {
       glez_resize(input::bounds.first, input::bounds.second);

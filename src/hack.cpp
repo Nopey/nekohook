@@ -25,6 +25,10 @@
 #include "modules/csgo/init.hpp"
 #endif
 
+#if defined(CATHOOK_GFX_GL)
+#include "modules/gl_draw/gl_draw.hpp"
+#endif
+
 #if defined(CATHOOK_DUMB_STRING) 	// A dummy string graphic-alyzer
 #include "modules/dumb_string/dumb_string.hpp"
 #endif

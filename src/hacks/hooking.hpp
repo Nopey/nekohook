@@ -11,7 +11,8 @@
  */
 
 #pragma once
-
+#include <cstdlib>
+using std::size_t;
 // Class used to hook functions in objects with virtual functions
 class VMTHook {
 public:
