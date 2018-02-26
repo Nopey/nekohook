@@ -1,4 +1,3 @@
-
 #
 #
 # Welcome to the cmake lists file, this controls how nekohook will build for your system
@@ -14,6 +13,8 @@ project (libnekohook)
 # User options can be set with cmake -D"NAME OF OPTION HERE"="VARIABLE", e.g. "cmake -DCGAME=csgo"
 set(CGAME tf2 CACHE STRING "Game to build with")
 set(CGFX valve_surface CACHE STRING "Graphics module to use")
+set(CUSEDUMBSTRING TRUE CACHE BOOL "Use Dummy string gfx?")
+set(CUI nmenu CACHE STRING "UI module to use")
 set(CINP xlib CACHE STRING "Input module to use")
 set(CUSERNAME UNREGISTERED CACHE STRING "Register a username")
 set(CUSERID 0 CACHE STRING "Register a id")
@@ -66,7 +67,28 @@ if(CGFX STREQUAL "valve_surface")
 	add_definitions("-DCATHOOK_GFX_SURFACE=1")
 elseif(CGFX STREQUAL "gl_draw")
   add_definitions("-DCATHOOK_GFX_GL=1")
-  list(APPEND SOURCE_FILES "src/modules/gl_draw/gl_draw.cpp")
+	list(APPEND SOURCE_FILES "src/modules/gl_draw/gl_draw.cpp")
+	add_subdirectory(src/modules/gl_draw/libglez/)
+	include_directories(SYSTEM src/modules/gl_draw/libglez/include)
+	#I don't remember why rdynamic is needed
+	add_compile_options(-rdynamic)
+	list(APPEND LINK_LIBRARIES glez)
+endif()
+
+## Dumb String
+if(CUSEDUMBSTRING)
+	add_definitions("-DCATHOOK_DUMB_STRING=1")
+	list(APPEND SOURCE_FILES "src/modules/dumb_string/dumb_string.cpp")
+endif()
+
+## UI Modules
+message(STATUS "UI module: ${CUI}")
+if(CUI STREQUAL "nmenu")
+	add_definitions("-DCATHOOK_UI_NMENU=1")
+  list(APPEND SOURCE_FILES "src/modules/nmenu/nmenu.cpp")
+else()
+	add_definitions("-DCATHOOK_UI_MISSING=1")
+	message(STATUS "Unknown UI module, Using no UI!")
 endif()
 
 ## Input modules
@@ -84,7 +106,14 @@ if(CBASE STREQUAL "SOURCE_2013_SDK")
 	set(CCOMMON_FLAGS "${CCOMMON_FLAGS} -m32")
   add_definitions(-DCATHOOK_SOURCE_2013=1)
   file(GLOB_RECURSE TMP_SOURCES "${CMAKE_SOURCE_DIR}/src/modules/Source_2013/*.c*")
-	list(APPEND SOURCE_FILES ${TMP_SOURCES}) # add our source sdk files
+  list(APPEND SOURCE_FILES ${TMP_SOURCES}) # add our source sdk files
+  set(SSDK_DIR "${CMAKE_SOURCE_DIR}/src/modules/Source_2013/sdk/mp/src")
+	if(EXISTS ${SSDK_DIR})
+		message(STATUS "Careful now, You're using Nopey's Hacky Version of SSDK.")
+		add_definitions("-DLINUX=1 -D_LINUX=1 -D_POSIX=1 -DPOSIX=1 -DUSE_SDL=1 -DGNUC=1 -DENABLE_IPC=1")
+		include_directories(SYSTEM ${SSDK_DIR} ${SSDK_DIR}/common ${SSDK_DIR}/public ${SSDK_DIR}/public/mathlib ${SSDK_DIR}/public/tier0 ${SSDK_DIR}/public/tier1 ${SSDK_DIR}/game/shared ${SSDK_DIR}/game/server)
+  endif()
+
 endif()
 
 # If anything uses xlib, we need the main file
@@ -128,4 +157,4 @@ message(STATUS "Flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 #include_directories(${INCLUDE_DIRS})
 add_library(nekohook SHARED ${SOURCE_FILES})
 
-target_link_libraries(nekohook c stdc++)
+target_link_libraries(nekohook c stdc++ ${LINK_LIBRARIES})

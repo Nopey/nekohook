@@ -7,18 +7,22 @@
  *
  */
 
-#include "../../frameworks/gameticks.hpp" // Run on draw
-#include "../../frameworks/drawing.hpp" // To
-#include "../../frameworks/input.hpp" // For bounds
+#include "../../framework/gameticks.hpp" // Run on draw
+#include "../../framework/drawing.hpp" // To
+#include "../../framework/input.hpp" // For bounds
+extern "C"{
 #include "libglez/include/glez.h" // Include the lib_glez for easy open gl drawing ;)
-
+}
 #include "gl_draw.hpp"
-
 namespace modules { namespace gl_draw {
 
 // Convert frameworks colors into glez colors
-static inline glez_rgba_t convert(const CatVector4& in) {
-  return glez_rgba_t(in.x, in.y, in.z, in.a);
+static inline glez_rgba_t convert(CatVector4 in) {
+  glez_rgba_t out;
+  out.r=in.x;
+  out.g=in.y;
+  out.b=in.z;
+  out.a=in.a;
 }
 
 // Font system, We only use 12 fonts to save on memory
@@ -51,8 +55,8 @@ void Init() {
   glez_init(input::bounds.first, input::bounds.second);
 
   // Glez draw before
-  auto last_bounds = input::bounds;
-  drawmgr_before([](){
+  static auto last_bounds = input::bounds;
+  drawmgr.REventBefore([](){
 
     // If our last bounds changed, we need to let glez know about the change
     if (last_bounds != input::bounds) {
@@ -65,14 +69,14 @@ void Init() {
   });
 
   // Glez draw before, Let glez know we are ending draw
-  drawmgr_after(glez_after);
+  drawmgr.REventAfter(glez_end);
 
   // Give the drawmgr our glez draw functions
-  draw::Line = [](int x, int y, int w, int h, const CatVector4& color) { glez_line(x, y, w, h, convert(color), 1); };
-  draw::Rect = [](int x, int y, int w, int h, const CatVector4& color) { glez_rect_outline(x, y, w, h, convert(color), 1); };
-  draw::RectFilled = [](int x, int y, int w, int h, const CatVector4& color) { glez_rect(x, y, w, h, convert(color)); };
+  draw::Line = [](int x, int y, int w, int h, CatVector4 color) { glez_line(x, y, w, h, convert(color), 1); };
+  draw::Rect = [](int x, int y, int w, int h, CatVector4 color) { glez_rect_outline(x, y, w, h, convert(color), 1); };
+  draw::RectFilled = [](int x, int y, int w, int h, CatVector4 color) { glez_rect(x, y, w, h, convert(color)); };
 
-  draw::Circle = [](int x, int y, const float& radius, int steps, const CatVector4& color){ glez_circle(x, y, radius, convert(color), 1, steps); };
+  draw::Circle = [](int x, int y, float radius, int steps, CatVector4 color){ glez_circle(x, y, radius, convert(color), 1, steps); };
 
   /*draw::String = [](const char* text, int x, int y, int font, int size, const CatVector4& color) {
     float tmp1, tmp2;

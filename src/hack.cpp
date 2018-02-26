@@ -25,6 +25,13 @@
 #include "modules/csgo/init.hpp"
 #endif
 
+#if defined(CATHOOK_DUMB_STRING) 	// A dummy string graphic-alyzer
+#include "modules/dumb_string/dumb_string.hpp"
+#endif
+#if defined(CATHOOK_UI_NMENU) 	// Basic UI
+#include "modules/nmenu/nmenu.hpp"
+#endif
+
 #include "hack.h"
 
 void hack::Initialize() {
@@ -49,6 +56,15 @@ void hack::Initialize() {
 	modules::source::Init();
 #elif defined(CATHOOK_CSGO) 	// CSGO
 	modules::csgo::Init();
+#endif
+
+#if defined(CATHOOK_DUMB_STRING) 	// A dummy string graphic-alyzer
+	g_CatLogging.log("Initializing dumb string...");
+	modules::dumb_string::Init();
+#endif
+#if defined(CATHOOK_UI_NMENU) 	// Basic UI
+	g_CatLogging.log("Initializing nmenu...");
+	modules::nmenu::Init();
 #endif
 
 	// Load configs

@@ -1,1 +1,1 @@
-make -j$(nproc) BUILD_DEBUG=1
+make -j$(nproc) BUILD_DEBUG=1 
