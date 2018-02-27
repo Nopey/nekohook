@@ -14,7 +14,7 @@
 #include <mathlib.h>
 #include <game/shared/shareddefs.h>
 #include <game/shared/usercmd.h>
-#include <game/client/iinput.h>
+//#include <game/client/iinput.h>
 #include <inetmessage.h>
 #include <icliententity.h>
 #include <igameevents.h>

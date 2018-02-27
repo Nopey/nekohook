@@ -62,9 +62,6 @@ void Init() {
   // Glez draw before
   static auto last_bounds = input::bounds;
   drawmgr.REventBefore([](){
-    //TODO: Detect Screen Resolution
-    input::bounds.first=1920;
-    input::bounds.second=1080;
     // If our last bounds changed, we need to let glez know about the change
     if (last_bounds != input::bounds) {
       glez_resize(input::bounds.first, input::bounds.second);

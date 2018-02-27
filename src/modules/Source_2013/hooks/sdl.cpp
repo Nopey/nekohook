@@ -5,12 +5,12 @@
  *      Author: nullifiedcat
  */
 
-
 #include "hookedmethods.hpp"
 #include "sdl.hpp"
 #include "../../../hacks/sharedobj.hpp"
 #include "../../../util/logging.hpp"
 #include "../../../framework/gameticks.hpp"
+#include "../../../framework/input.hpp"
 #include "../../gl_draw/gl_draw.hpp"
 #include "../gameso.hpp"
 #include "PaintTraverse.hpp"
@@ -77,6 +77,7 @@ void SDL_GL_SwapWindow_hook(SDL_Window *window)
         {
             //TODO: init graphics CMFunction
             sdl_gl_context = SDL_GL_CreateContext(window);
+            SDL_GetWindowSize(window,&input::bounds.first,&input::bounds.second);
 #if defined(CATHOOK_GFX_GL)
             //g_CatLogging.log("Initializing GL_DRAW graphics module...");
             modules::gl_draw::Init();
@@ -107,12 +108,17 @@ int SDL_PollEvent_hook(SDL_Event *event)
         {
             switch (event->window.event)
             {
+            case SDL_WINDOWEVENT_RESIZED:
+                g_CatLogging.log(("Window Resized.. "+std::to_string(event->window.data1)+", "+std::to_string(event->window.data2)).c_str());
+                input::bounds.first = event->window.data1;
+                input::bounds.second = event->window.data2;
+                break;
             case SDL_WINDOWEVENT_HIDDEN:
                 g_CatLogging.log("Window Hidden");
-                return 0;
+                break;
             case SDL_WINDOWEVENT_MINIMIZED:
                 g_CatLogging.log("Window Minimized");
-                return 0;
+                break;
             }
         }
     }
@@ -134,16 +140,16 @@ void DoSDLHooking()
     //        SDL_GetWindowFlags_o = *SDL_GetWindowFlags_loc;
     //        *SDL_GetWindowFlags_loc = SDL_GetWindowFlags_hook;
 
-    //        SDL_PollEvent_loc =
-    //        reinterpret_cast<SDL_PollEvent_t*>(sharedobj::libsdl().Pointer(0xFCF64));
+    SDL_PollEvent_loc =reinterpret_cast<SDL_PollEvent_t *>(
+        gameso::Pointer(gameso::libsdl(),0xFCF64));
 
-    //        SDL_PollEvent_o = *SDL_PollEvent_loc;
-    //        *SDL_PollEvent_loc = SDL_PollEvent_hook;
+    SDL_PollEvent_o = *SDL_PollEvent_loc;
+    *SDL_PollEvent_loc = SDL_PollEvent_hook;
 }
 
 void DoSDLUnhooking()
 {
     *SDL_GL_SwapWindow_loc = SDL_GL_SwapWindow_o;
-    //        *SDL_GetWindowFlags_loc = SDL_GetWindowFlags_o;
-    //        *SDL_PollEvent_loc = SDL_PollEvent_o;
+    //*SDL_GetWindowFlags_loc = SDL_GetWindowFlags_o;
+    *SDL_PollEvent_loc = SDL_PollEvent_o;
 }
