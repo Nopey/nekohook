@@ -83,7 +83,6 @@ void PaintTraverse_hook(void *_this, unsigned int vp, bool fr, bool ar)
     }
     call_default = true;
     //TODO: reimplement master switch for cheats
-        call_default = false;
 
     if (call_default)
         original(_this, vp, fr, ar);

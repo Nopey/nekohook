@@ -79,7 +79,7 @@ void SDL_GL_SwapWindow_hook(SDL_Window *window)
             sdl_gl_context = SDL_GL_CreateContext(window);
             SDL_GetWindowSize(window,&input::bounds.first,&input::bounds.second);
 #if defined(CATHOOK_GFX_GL)
-            //g_CatLogging.log("Initializing GL_DRAW graphics module...");
+            g_CatLogging.log("Initializing gl_draw graphics module...");
             modules::gl_draw::Init();
 #endif
 

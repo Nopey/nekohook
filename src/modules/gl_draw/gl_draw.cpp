@@ -7,6 +7,7 @@
  *
  */
 
+#include "../../util/logging.hpp"
 #include "../../framework/gameticks.hpp" // Run on draw
 #include "../../framework/drawing.hpp" // To
 #include "../../framework/input.hpp" // For bounds
@@ -52,7 +53,7 @@ void Init() {
   auto error = glewInit();
   glClearColor(1.0, 0.0, 0.0, 0.5);
   if (GLEW_OK != error){
-    std::cerr<<"Error Initializing GLEW for gl_draw: "<<glewGetErrorString(error)<<std::endl;
+    g_CatLogging.log("Error while initializing GLEW for gl_draw: %s",glewGetErrorString(error));
     return;
   }
 
@@ -64,6 +65,7 @@ void Init() {
   drawmgr.REventBefore([](){
     // If our last bounds changed, we need to let glez know about the change
     if (last_bounds != input::bounds) {
+      g_CatLogging.log("Resizing GLEZ");
       glez_resize(input::bounds.first, input::bounds.second);
       last_bounds = input::bounds;
     }
