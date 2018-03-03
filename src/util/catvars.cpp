@@ -22,8 +22,16 @@ CatMenuTree CatMenuRoot;
 
 // Menu tree
 void CatMenuTree::AddTree(CatVar* cat_var, int recursions) {
-	// Check if we reached the end if the enum info, if not we can add more to the tree
-	if (cat_var->gui_position.size() <= recursions) {
+  if(recursions==0){
+	std::string str;
+    for(auto i : cat_var->gui_position){
+	  str+=i+" -> ";
+	}
+	str+=cat_var->name;
+	g_CatLogging.log("%s",str.c_str());
+  }
+  // Check if we reached the end if the enum info, if not we can add more to the tree
+  if (cat_var->gui_position.size() <= recursions) {
     cat_children.push_back(cat_var); // We finished recursing
     return;
   }
@@ -31,7 +39,7 @@ void CatMenuTree::AddTree(CatVar* cat_var, int recursions) {
   // Look through the children and if any have the name of one we might want to make, we can reuse the branch
   for (auto& tree_branch : children) {
     // Test if this is an existing branch with matching names
-    if (tree_branch.name == cat_var->gui_position[recursions]) continue;
+    if (tree_branch.name != cat_var->gui_position[recursions]) continue;
     // We found our branch, recurse into it
     tree_branch.AddTree(cat_var, recursions + 1);
     return;
@@ -42,10 +50,23 @@ void CatMenuTree::AddTree(CatVar* cat_var, int recursions) {
   sapling.AddTree(cat_var, recursions + 1);
 }
 
+void CatMenuTree::Stringify(std::stringstream &ss) {
+	ss<<name<<":{";
+	for(auto child : cat_children){
+		ss<<child->name<<", ";
+	}
+
+	for(auto &child : children){
+		child.Stringify(ss);
+		ss<<", ";
+	}
+	ss<<"}";
+
+}
 // General catvar constructor
 CatVar::CatVar(const CatEnum& _gui_position, std::string _name, std::string _desc_short, std::string _desc_long)
 	: gui_position(_gui_position), name(COM_PREFIX + _name), desc_short(_desc_short), desc_long(_desc_long) {
-	CatVarMap.insert({name, this}); // Broken
+  CatVarMap.insert({name, this}); // Broken
   // Add the catvar to the menu tree
   CatMenuRoot.AddTree(this);
 }

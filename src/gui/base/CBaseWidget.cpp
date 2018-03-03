@@ -52,6 +52,7 @@ void CBaseWidget::Show() { visible = true; }
 void CBaseWidget::Hide() { visible = false; }
 
 // Sizing
+//TODO: Optimization: Have parent pass own absolute position to child.
 std::pair<int, int> CBaseWidget::AbsolutePosition() {
 	auto result = offset;
 	auto pParent = parent;

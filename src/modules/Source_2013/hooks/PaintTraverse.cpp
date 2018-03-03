@@ -31,7 +31,7 @@ void **pure_addr = nullptr;
 CatEnum software_cursor_enum({ "KEEP", "ALWAYS", "NEVER", "MENU ON",
                                "MENU OFF" });
 CatVarEnum
-    software_cursor_mode(software_cursor_enum, {"misc"}, "software_cursor_mode", 0,
+    software_cursor_mode({"misc"}, software_cursor_enum, "software_cursor_mode", 0,
                          "Software cursor",
                          "Try to change this and see what works best for you");
 

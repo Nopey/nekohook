@@ -95,9 +95,8 @@ void CBaseContainer::OnKeyPress(int key) {
 		}
 		//Flip to previous child
 		else if (key==prevkey.value){
-			auto foc = std::find(children.begin(),children.end(),focused_child);
-			//Compares, then decrements.
-			while(foc--!=children.begin()){
+			auto foc = std::find(children.rbegin(),children.rend(),focused_child);
+			while(++foc!=children.rend()){
 				if((*foc)->IsVisible()&&TryFocusOn(*foc)){
 					//We found a new child
 					break;

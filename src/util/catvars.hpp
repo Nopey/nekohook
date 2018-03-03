@@ -10,6 +10,7 @@
 #include <string>	// Strings are easy and hard not to use especially for a value like a catvar where it wont be changing often
 #include <vector>	// Makes storage of GUI locations and enum info really hard not to recomend
 #include <unordered_map>
+#include <sstream>
 
 #include "../framework/console.hpp"
 #include "colors.hpp"
@@ -107,6 +108,7 @@ public:
 	virtual std::string GetValue();
 };
 
+#include "logging.hpp"
 
 // Class to store how the menu is layed out
 class CatMenuTree {
@@ -114,6 +116,7 @@ public:
 	CatMenuTree(std::string string = "") : name(string) {}
 
 	void AddTree(CatVar* cat_var, int recursions = 0);
+	void Stringify(std::stringstream &ss);
 	std::string name;
 	std::vector<CatMenuTree> children;
 	std::vector<CatVar*> cat_children;	// Nyaa~ :3
