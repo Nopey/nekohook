@@ -32,11 +32,14 @@ private:
 };
 
 // To handle calling of events
-class CMEvent {
-  std::vector<void_func> func_pool; // to store added functions
+template <typename... args>
+class CMEvent{
+  using func_type = void(*)(args...); // For std::function template like use
+  std::vector<func_type> func_pool; // to store added functions
 public:
-  inline void operator()(/*bool do_multithreading = false*/) {
-    for (const auto& func : func_pool) func();
+///*bool do_multithreading = false*/
+  inline void operator()(args... a) {
+    for (const auto& func : func_pool) func(a...);
     /* TODO, FIX THREADING
     // Make enough threads for as many functions as we have.
     std::thread func_threads[func_pool.size()];
@@ -48,8 +51,8 @@ public:
     for (auto& thread : func_threads)
       thread.join();*/
   }
-  void add(void_func in) { func_pool.push_back(in); }
-  void remove(void_func in) {
+  inline void add(func_type in) { func_pool.push_back(in); }
+  inline void remove(func_type in) {
     for(int i = 0; i < func_pool.size(); i++) {
       if (func_pool[i] == in) {
         // Remove function from pool
@@ -64,9 +67,9 @@ public:
 
 // This is to handle before and after events happen
 class CMEventGroup {
-  CMEvent before_event;
-  CMEvent during_event;
-  CMEvent after_event;
+  CMEvent<> before_event;
+  CMEvent<> during_event;
+  CMEvent<> after_event;
 public:
   inline void operator()() {
     before_event();

@@ -14,7 +14,7 @@
 
 namespace gui { namespace sidestrings {
 
-HudString SideStrings(8, 8);// Stores side strings
+HudString SideStrings(8, 66);// Stores side strings
 
 // The main string to use at the top
 std::string top_string = "Nekohook";
@@ -32,15 +32,14 @@ static void AddDefault() {
 		if (!g_GameInfo.authors.empty()) {
 			top_string += " by ";
 			for (int i = 0; i < g_GameInfo.authors.size(); i++) {
-				const std::string& tmp = g_GameInfo.authors.at(i);
+				top_string += g_GameInfo.authors.at(i); // Add our author
 				// Determine whether we should add a comma
-				if (i > 0) {
-					if (i - 2 >= g_GameInfo.authors.size())
+				if (i+1 < g_GameInfo.authors.size()) {
+					if (i + 2 == g_GameInfo.authors.size())
 						top_string += " and ";
 					else
 						top_string += ", ";
 				}
-				top_string += tmp; // Add our author
 			}
 		}
 		// Suqqe

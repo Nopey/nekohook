@@ -27,8 +27,9 @@ CBaseWidget::CBaseWidget(const char* _name) {
 void CBaseWidget::Update() {}
 void CBaseWidget::Draw() {}
 void CBaseWidget::DrawBounds() {
-	// Set random bounds color
+	//If the bounds color is unset
 	if (bounds_color == CatVector4())
+		// Set random bounds color
 		bounds_color = CatVector4(rand() % 255, rand() % 255, rand() % 255, 255);
 	auto abs_pos = AbsolutePosition();
 	draw::RectFilled(abs_pos.first, abs_pos.second, size.first, size.second, colors::Transparent(bounds_color, 0.25f));
@@ -40,9 +41,9 @@ void CBaseWidget::OnMouseEnter()	{ hover = true; }
 void CBaseWidget::OnMouseLeave() 	 { hover = false; }
 void CBaseWidget::OnMousePress() 	 { press = true; }
 void CBaseWidget::OnMouseRelease() { press = false; }
-void CBaseWidget::OnFocusGain() 	 { focus = true; }
+bool CBaseWidget::TryFocusGain() 	 { focus = true; return true; }
 void CBaseWidget::OnFocusLose() 	 { focus = false; }
-void CBaseWidget::OnKeyPress(int key, bool repeat) {};
+void CBaseWidget::OnKeyPress(int key) {};
 void CBaseWidget::OnKeyRelease(int key) {};
 bool CBaseWidget::ConsumesKey(int key) { return false; }
 

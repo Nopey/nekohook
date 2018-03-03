@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "../util/functions.hpp" // CMEvent
 #include <utility> // Pairs
 
 enum {
@@ -67,6 +68,9 @@ enum {
 namespace input {
 
 extern bool pressed_buttons[CATKEY_COUNT];
+
+extern CMEvent<int> key_pressed;
+extern CMEvent<int> key_released;
 
 // Mouse info
 extern std::pair<int, int> mouse;

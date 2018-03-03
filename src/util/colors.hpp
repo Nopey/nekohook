@@ -44,15 +44,15 @@ inline CatVector4 FromHSL(float h, float s, float v) {
 
 // Colors
 const CatVector4 white 	= CatVector4(255, 255, 255, 255);
-const CatVector4 black 	= CatVector4(0, 0, 0, 255);
+const CatVector4 black 	= CatVector4(0,   0,   0,   255);
 const CatVector4 pink 	= CatVector4(255, 105, 180, 255);
-const CatVector4 red 		= CatVector4(237, 42, 42, 255);
-const CatVector4 blue 	= CatVector4(28, 108, 237, 255);
-const CatVector4 yellow = CatVector4(255, 255, 0, 255);
-const CatVector4 orange = CatVector4(255, 120, 0, 255);
-const CatVector4 green 	= CatVector4(0, 255, 0, 255);
+const CatVector4 red 	= CatVector4(237, 42,  42,  255);
+const CatVector4 blue 	= CatVector4(28,  108, 237, 255);
+const CatVector4 yellow = CatVector4(255, 255, 0,   255);
+const CatVector4 orange = CatVector4(255, 120, 0,   255);
+const CatVector4 green 	= CatVector4(0,   255, 0,   255);
 const CatVector4 gray   = CatVector4(100, 100, 100, 255);
-const CatVector4 empty 	= CatVector4(0, 0, 0, 0);
+const CatVector4 empty 	= CatVector4(0,   0,   0,   0);
 
 // Color functions
 extern CMFunction<CatVector4(CatEntity*)> EntityColor;

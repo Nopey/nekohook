@@ -8,6 +8,7 @@
  */
 
 #include "input.hpp"
+using std::size_t;
 
 namespace input {
 
@@ -19,6 +20,10 @@ std::pair<int, int> mouse(0, 0);
 
 // Screen height and width
 std::pair<int, int> bounds(0, 0);
+
+CMEvent<int> key_pressed;
+CMEvent<int> key_released;
+
 
 // Holds our cat keys as strings
 const char* key_names[] = {

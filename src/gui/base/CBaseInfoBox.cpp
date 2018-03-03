@@ -15,7 +15,7 @@
 
 namespace gui { namespace base {
 
-CBaseInfoBox::CBaseInfoBox(const char* _name, const char* info) : CBaseWidget(_name), infostring(info) {
+CBaseInfoBox::CBaseInfoBox(const char* _name, const char* info) : CBaseWidget(_name), infostring(info){
   position_mode = ABSOLUTE;
 }
 

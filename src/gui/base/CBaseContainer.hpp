@@ -26,8 +26,9 @@ public:
 	virtual void OnMouseLeave();
 	virtual void OnMousePress();
 	virtual void OnMouseRelease();
+	virtual bool TryFocusGain();
 	virtual void OnFocusLose();
-	virtual void OnKeyPress(int key, bool repeat);
+	virtual void OnKeyPress(int key);
 	virtual void OnKeyRelease(int key);
 	virtual bool ConsumesKey(int key);
 
@@ -53,11 +54,13 @@ public:
 
 	// Child info related to the container
 	void HoverOn(IWidget* child);
-	void FocusOn(IWidget* child);
+	bool TryFocusOn(IWidget* child);
 	void PressOn(IWidget* child);
 	IWidget* hovered_child = nullptr;
 	IWidget* focused_child = nullptr;
 	IWidget* pressed_child = nullptr;
+	// Not a guarantee
+	bool can_focus_on_nothing = false;
 };
 
 }}

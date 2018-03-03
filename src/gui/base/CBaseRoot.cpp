@@ -9,6 +9,7 @@
 #include "CBaseInfoBox.hpp"
 
 #include "CBaseRoot.hpp"
+#include "../../util/logging.hpp"
 
 namespace gui { namespace base {
 
@@ -22,7 +23,7 @@ CBaseRoot::CBaseRoot() : CBaseContainer("Root") {
 
 // An update engine for the gui
 void CBaseRoot::Update() {
-
+/*
   // Input handler
 	for (int i = 0; i < CATKEY_COUNT; i++) {
 
@@ -68,15 +69,38 @@ void CBaseRoot::Update() {
 
   // Increse our framecount
   frame_count++;
-
+*/
   // Update tick to elements
+  max_size = input::bounds;
   CBaseContainer::Update();
 
   // Draw
   Draw();
 }
 
+void CBaseRoot::OnKeyPress(int key){
+	if(key==CATKEY_MOUSE_1){
+		OnMousePress();
+	}else{
+		CBaseContainer::OnKeyPress(key);
+	}
+}
+
+void CBaseRoot::OnKeyRelease(int key){
+	if(key==CATKEY_MOUSE_1){
+		OnMouseRelease();
+	}else{
+		CBaseContainer::OnKeyRelease(key);
+	}
+}
+
 // This would draw the entire screen so we override
-void CBaseRoot::DrawBounds() { for (auto child : children) if (child->IsVisible()) child->DrawBounds(); }
+void CBaseRoot::DrawBounds() {
+	for (auto child : children){
+		if (child->IsVisible()){
+			child->DrawBounds();
+		}
+	}
+}
 
 }}

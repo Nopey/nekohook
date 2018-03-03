@@ -8,11 +8,16 @@
 #include <cstring> // strcmp()
 #include <algorithm> // std::sort
 
+#include "../../framework/drawing.hpp" // Draw stuff
+#include "../../util/colors.hpp" // Draw stuff
 #include "../../framework/input.hpp"
+#include "../gui.hpp"
 
 #include "CBaseContainer.hpp"
 
 namespace gui { namespace base {
+
+using namespace gui;
 
 // Constructor & destructor
 CBaseContainer::CBaseContainer(const char* _name) : CBaseWidget(_name) {}
@@ -36,6 +41,8 @@ void CBaseContainer::Draw() {
 	}
 }
 void CBaseContainer::DrawBounds() {
+	auto abs_pos = AbsolutePosition();
+	draw::Rect(abs_pos.first, abs_pos.second, size.first, size.second, focus ? (focused_child?colors::pink:colors::blue) : colors::gray);
 	for (auto child : children) {
 		if (child->IsVisible()) {
 			child->DrawBounds();
@@ -55,19 +62,81 @@ void CBaseContainer::OnMousePress() {
 void CBaseContainer::OnMouseRelease() {
 	if (pressed_child) pressed_child->OnMouseRelease();
 }
+bool CBaseContainer::TryFocusGain() {
+	if(can_focus_on_nothing) return true;
+	//TODO: Move this into it's own function.
+	for(auto child : children){
+		if(child->IsVisible()&&TryFocusOn(child)){
+			return true;
+		}
+	}
+	return false;
+}
 void CBaseContainer::OnFocusLose() {
-	FocusOn(0);
+	TryFocusOn(0);
 	CBaseWidget::OnFocusLose();
 }
-void CBaseContainer::OnKeyPress(int key, bool repeat) {
-	if (focused_child) focused_child->OnKeyPress(key, repeat);
+void CBaseContainer::OnKeyPress(int key) {
+	if(focused_child&&focused_child->ConsumesKey(key)){
+		focused_child->OnKeyPress(key);
+	}else{
+		//Flip to next child
+		if(key==nextkey.value){
+			//TODO: Replace focused_child with the index of the selected child
+			// so we don't have to spend time finding it here
+			auto foc = std::find(children.begin(),children.end(),focused_child);
+			//Increments, then compares.
+			while(++foc!=children.end()){
+				if((*foc)->IsVisible()&&TryFocusOn(*foc)){
+					//We found a new child
+					break;
+				}
+			}
+		}
+		//Flip to previous child
+		else if (key==prevkey.value){
+			auto foc = std::find(children.begin(),children.end(),focused_child);
+			//Compares, then decrements.
+			while(foc--!=children.begin()){
+				if((*foc)->IsVisible()&&TryFocusOn(*foc)){
+					//We found a new child
+					break;
+				}
+			}
+		}
+		//Escape
+		else if (key==backkey.value){
+			if(can_focus_on_nothing){
+				TryFocusOn(0);
+			}
+		}
+		else if (key==activatekey.value){
+			if(!focused_child){
+				for(auto child:children){
+					if(child->IsVisible()){
+						TryFocusOn(child);
+					}
+				}
+			}
+		}
+		
+	}
 }
 void CBaseContainer::OnKeyRelease(int key) {
+	//Tempted to just fully hand these key release events on, but that'll just slow things down.
 	if (focused_child) focused_child->OnKeyRelease(key);
 }
 bool CBaseContainer::ConsumesKey(int key) {
-	if (focused_child) return focused_child->ConsumesKey(key);
-	return false;
+	//If our focused child consumes, we can't
+	return (focused_child && focused_child->ConsumesKey(key))
+	//If we can go to prev/next child, do so.
+	|| (key==nextkey && focused_child!=children.back())
+	|| (key==prevkey && focused_child!=children.front())
+	//If we can focus on nothing, and are currently focusing on something
+	//(otherwise our parent container gets the backkey and will defocus our entire container)
+	|| (key==backkey && can_focus_on_nothing && focused_child)
+	//Or if we can `activate`
+	|| (key==activatekey && focused_child==nullptr);
 }
 
 // Visiblity
@@ -135,6 +204,7 @@ void CBaseContainer::MoveChildren() {
 	// Used space
 	std::pair<int, int> space = std::make_pair(-1, -1);
 	// Get our absolutes down
+	// Find a Bounding box around all of the absolutes
 	for (auto c : children) {
 		if (!c->IsVisible()) continue;
 		// Check if not absolute
@@ -192,19 +262,35 @@ void CBaseContainer::HoverOn(IWidget* child) {
 	if (child) child->OnMouseEnter();
 	hovered_child = child;
 }
-void CBaseContainer::FocusOn(IWidget* child) {
+bool CBaseContainer::TryFocusOn(IWidget* child) {
 	if (focused_child != child) {
-		if (focused_child) focused_child->OnFocusLose();
-		if (child) child->OnFocusGain();
-		focused_child = child;
+		if (child){
+			if (focused_child) focused_child->OnFocusLose();
+			focused_child = child;
+			return child->TryFocusGain();
+		}else{
+			if(can_focus_on_nothing){
+				if (focused_child) focused_child->OnFocusLose();
+				focused_child = nullptr;
+				//You can focus on nothing if you want to
+				//(as proved in elementary school)
+				return true;
+			}else{
+				return false;
+			}
+		}
+	}else{
+		//TODO: Consider this.. Should it return true or false?
+		//Probably doesn't matter, I can't imagine the mouse will care.
+		return false;
 	}
 }
 void CBaseContainer::PressOn(IWidget* child) {
 	pressed_child = child;
 	if (child) {
-		FocusOn(child);
+		TryFocusOn(child);
 		child->OnMousePress();
-	} else FocusOn(0);
+	} else TryFocusOn(0);
 }
 
 }}

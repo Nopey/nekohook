@@ -18,7 +18,7 @@ namespace gui { namespace base {
 enum {
 	FLOATING, // Widget handles own positions
 	ABSOLUTE, // Absolutes are positions that are static, and depends on the side they are on. Absobutes are for things supposed to be at the top
-	INLINE // Automatic mamagement of widget requested
+	INLINE // Automatic management of widget requested
 };
 
 class IWidget {
@@ -60,9 +60,11 @@ public:
 	virtual void OnMouseLeave() = 0;
 	virtual void OnMousePress() = 0;
 	virtual void OnMouseRelease() = 0;
-	virtual void OnFocusGain() = 0;
+	virtual bool TryFocusGain() = 0;
 	virtual void OnFocusLose() = 0;
-	virtual void OnKeyPress(int key, bool repeat) = 0;
+	//TODO: Text input repeat
+	//virtual void OnKeyPress(int key, bool repeat) = 0;
+	virtual void OnKeyPress(int key) = 0;
 	virtual void OnKeyRelease(int key) = 0;
 	virtual bool ConsumesKey(int key) = 0;
 

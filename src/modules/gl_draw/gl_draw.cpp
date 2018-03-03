@@ -8,6 +8,7 @@
  */
 
 #include "../../util/logging.hpp"
+#include "../../util/colors.hpp"
 #include "../../framework/gameticks.hpp" // Run on draw
 #include "../../framework/drawing.hpp" // To
 #include "../../framework/input.hpp" // For bounds
@@ -19,7 +20,11 @@ namespace modules { namespace gl_draw {
 
 // Convert frameworks colors into glez colors
 static inline glez_rgba_t convert(CatVector4 in) {
-  return {in.x,in.y,in.z,in.a};
+  //Optimized away
+  auto tmp = colors::FromRGBA8(in);
+  return {tmp.x,tmp.y,tmp.z,tmp.a};
+  //casts to unsigned char and back
+  //return glez_rgba(in.x, in.y, in.z, in.a);
 }
 
 // Font system, We only use 12 fonts to save on memory
@@ -37,7 +42,7 @@ static const glez_font_t& GetGlezFont(int font, int size) {
       g_CatLogging.log("Found Font: %s",font.first.c_str());
       // Per size
 			for (int ii = 0; ii < 12; ii++) {
-        glez_fonts[i][ii] = glez_font_load_from_memory((void*)font.second->data(), font.second->size(), ii*2+20);
+        glez_fonts[i][ii] = glez_font_load_from_memory((void*)font.second->data(), (void*)font.second->size(), ii*2+20);
 			}
       i++;
     }
@@ -53,21 +58,12 @@ static const glez_font_t& GetGlezFont(int font, int size) {
 		font_init = true;
 	}
 	// Clamping as we dont have that many font sizes
-	return glez_fonts[font][std::max(std::min(32, size), 20)/2 - 10];
+	return glez_fonts[std::max(std::min(font,(int)font_map.size()),0)][std::max(std::min(32, size), 20)/2 - 10];
 }
 
 // Run to init glez
 void Init() {
-  // "More! Apac"
-  //g_CatLogging.log("More! %c%c%c%c", LICENSE_txt[35], LICENSE_txt[36], char(LICENSE_txt[37]), char(LICENSE_txt[38]));
-  //g_CatLogging.log("%c%c%c%c",LICENSE_txt_str[35],LICENSE_txt_str[36],LICENSE_txt_str[37],LICENSE_txt_str[38]);
-  //g_CatLogging.log("%d  %d",LICENSE_txt_str.size(), LICENSE_txt_size);
-  for(auto font:font_map){
-    g_CatLogging.log("Found Font: %s",font.first.c_str());
-  }
-  //glewExperimental = GL_TRUE;
   auto error = glewInit();
-  //glClearColor(1.0, 0.0, 0.0, 0.5);
   if (GLEW_OK != error){
     g_CatLogging.log("Error while initializing GLEW for gl_draw: %s",glewGetErrorString(error));
     return;
@@ -81,7 +77,6 @@ void Init() {
   drawmgr.REventBefore([](){
     // If our last bounds changed, we need to let glez know about the change
     if (last_bounds != input::bounds) {
-      g_CatLogging.log("Resizing GLEZ");
       glez_resize(input::bounds.first, input::bounds.second);
       last_bounds = input::bounds;
     }

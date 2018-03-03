@@ -20,8 +20,7 @@
 #include <SDL2/SDL_events.h>
 #include <GL/glew.h>
 #include <GL/gl.h>
-//#include <X11/Xlib.h>
-//#include <GL/glx.h>
+#include <map>
 
 //TODO: Remove
 #define PROF_SECTION(id)
@@ -98,26 +97,110 @@ void SDL_GL_SwapWindow_hook(SDL_Window *window)
     // glXSwapBuffers(wminfo.info.x11.display, wminfo.info.x11.window);
 }
 
+
+std::map<SDL_Keycode,int> sdl_keymap = {
+	{SDLK_0, CATKEY_0}, {SDLK_1, CATKEY_1}, {SDLK_2, CATKEY_2},
+	{SDLK_3, CATKEY_3}, {SDLK_4, CATKEY_4}, {SDLK_5, CATKEY_5},
+	{SDLK_6, CATKEY_6}, {SDLK_7, CATKEY_7}, {SDLK_8, CATKEY_8},
+	{SDLK_9, CATKEY_9}, {SDLK_a, CATKEY_A}, {SDLK_b, CATKEY_B},
+	{SDLK_c, CATKEY_C}, {SDLK_d, CATKEY_D}, {SDLK_e, CATKEY_E},
+	{SDLK_f, CATKEY_F}, {SDLK_g, CATKEY_G}, {SDLK_h, CATKEY_H},
+	{SDLK_i, CATKEY_I}, {SDLK_j, CATKEY_J}, {SDLK_k, CATKEY_K},
+	{SDLK_l, CATKEY_L}, {SDLK_m, CATKEY_M}, {SDLK_n, CATKEY_N},
+	{SDLK_o, CATKEY_O}, {SDLK_p, CATKEY_P}, {SDLK_q, CATKEY_Q},
+	{SDLK_r, CATKEY_R}, {SDLK_s, CATKEY_S}, {SDLK_t, CATKEY_T},
+	{SDLK_u, CATKEY_U}, {SDLK_v, CATKEY_V}, {SDLK_w, CATKEY_W},
+	{SDLK_x, CATKEY_X}, {SDLK_y, CATKEY_Y}, {SDLK_z, CATKEY_Z},
+
+	{SDLK_ESCAPE, CATKEY_ESCAPE}, {SDLK_LEFTBRACKET, CATKEY_LBRACKET},
+	{SDLK_RIGHTBRACKET, CATKEY_RBRACKET}, {SDLK_SEMICOLON, CATKEY_SEMICOLON},
+	{SDLK_QUOTE, CATKEY_APOSTROPHE}, {SDLK_BACKQUOTE, CATKEY_BACKQUOTE},
+	{SDLK_COMMA, CATKEY_COMMA}, {SDLK_PERIOD, CATKEY_PERIOD}, {SDLK_SLASH, CATKEY_SLASH},
+	{SDLK_BACKSLASH, CATKEY_BACKSLASH}, {SDLK_MINUS, CATKEY_MINUS}, {SDLK_EQUALS, CATKEY_EQUAL},
+	{SDLK_RETURN, CATKEY_ENTER}, {SDLK_SPACE, CATKEY_SPACE}, {SDLK_BACKSPACE, CATKEY_BACKSPACE},
+	{SDLK_TAB, CATKEY_TAB}, {SDLK_CAPSLOCK, CATKEY_CAPSLOCK},
+
+	{SDLK_INSERT, CATKEY_INSERT}, {SDLK_DELETE, CATKEY_DELETE},
+	{SDLK_HOME, CATKEY_HOME}, {SDLK_END, CATKEY_END},
+	{SDLK_PAGEUP, CATKEY_PAGEUP}, {SDLK_PAGEDOWN, CATKEY_PAGEDOWN},
+
+	{SDLK_LSHIFT, CATKEY_LSHIFT}, {SDLK_RSHIFT, CATKEY_RSHIFT},
+	{SDLK_LALT, CATKEY_LALT}, {SDLK_RALT, CATKEY_RALT},
+	{SDLK_LCTRL, CATKEY_LCONTROL}, {SDLK_RCTRL, CATKEY_RCONTROL},
+
+	{SDLK_KP_0, CATKEY_PAD_0}, {SDLK_KP_1, CATKEY_PAD_1}, {SDLK_KP_2, CATKEY_PAD_2},
+	{SDLK_KP_3, CATKEY_PAD_3}, {SDLK_KP_4, CATKEY_PAD_4}, {SDLK_KP_5, CATKEY_PAD_5},
+	{SDLK_KP_6, CATKEY_PAD_6}, {SDLK_KP_7, CATKEY_PAD_7}, {SDLK_KP_8, CATKEY_PAD_8},
+	{SDLK_KP_9, CATKEY_PAD_9},
+
+	{SDLK_KP_DIVIDE, CATKEY_PAD_DIVIDE}, {SDLK_KP_MULTIPLY, CATKEY_PAD_MULTIPLY},
+	{SDLK_KP_MINUS, CATKEY_PAD_MINUS}, {SDLK_KP_PLUS, CATKEY_PAD_PLUS},
+	{SDLK_KP_ENTER, CATKEY_PAD_ENTER}, {SDLK_KP_DECIMAL, CATKEY_PAD_DECIMAL},
+
+	{SDLK_UP, CATKEY_UP}, {SDLK_LEFT, CATKEY_LEFT},
+	{SDLK_DOWN, CATKEY_DOWN}, {SDLK_RIGHT, CATKEY_RIGHT},
+
+	{SDLK_F1, CATKEY_F1}, {SDLK_F2, CATKEY_F2}, {SDLK_F3, CATKEY_F3},
+	{SDLK_F4, CATKEY_F4}, {SDLK_F5, CATKEY_F5}, {SDLK_F6, CATKEY_F6},
+	{SDLK_F7, CATKEY_F7}, {SDLK_F8, CATKEY_F8}, {SDLK_F9, CATKEY_F9},
+	{SDLK_F10, CATKEY_F10}, {SDLK_F11, CATKEY_F11}, {SDLK_F12, CATKEY_F12},};
+
 int SDL_PollEvent_hook(SDL_Event *event)
 {
     int ret = SDL_PollEvent_o(event);
     if (ret)
     {
         //logging::Info("event %x %x", event->type, event->common.type);
-        if (event->type == SDL_WINDOWEVENT)
+        switch (event->type)
         {
-            switch (event->window.event)
-            {
-            case SDL_WINDOWEVENT_RESIZED:
-                g_CatLogging.log(("Window Resized.. "+std::to_string(event->window.data1)+", "+std::to_string(event->window.data2)).c_str());
-                input::bounds.first = event->window.data1;
-                input::bounds.second = event->window.data2;
+            case SDL_KEYDOWN:{
+                auto key = sdl_keymap.find(event->key.keysym.sym);
+                if(key!=sdl_keymap.end()){
+                    //g_CatLogging.log("BTN DWN %s",input::key_names[key->second]);
+                    input::pressed_buttons[key->second]=true;
+                    input::key_pressed(key->second);
+                }
                 break;
-            case SDL_WINDOWEVENT_HIDDEN:
-                g_CatLogging.log("Window Hidden");
+            }
+            case SDL_KEYUP:{
+                auto key = sdl_keymap.find(event->key.keysym.sym);
+                if(key!=sdl_keymap.end()){
+                    //g_CatLogging.log("BTN UP %s",input::key_names[key->second]);
+                    input::pressed_buttons[key->second]=false;
+                    input::key_released(key->second);
+                }
                 break;
-            case SDL_WINDOWEVENT_MINIMIZED:
-                g_CatLogging.log("Window Minimized");
+            }
+            case SDL_MOUSEMOTION:{
+                input::mouse.first = event->motion.x;
+                input::mouse.second = event->motion.y;
+            }
+            case SDL_MOUSEBUTTONDOWN:{
+                auto key = CATKEY_MOUSE_1 + event->button.button - SDL_BUTTON_LEFT;
+                input::pressed_buttons[key] = true;
+                input::key_pressed(key);
+                break;
+            }
+            case SDL_MOUSEBUTTONUP:{
+                auto key = CATKEY_MOUSE_1 + event->button.button - SDL_BUTTON_LEFT;
+                input::pressed_buttons[key] = false;
+                input::key_released(key);
+                break;
+            }
+            case SDL_WINDOWEVENT:{
+                switch (event->window.event)
+                {
+                case SDL_WINDOWEVENT_RESIZED:
+                    input::bounds.first = event->window.data1;
+                    input::bounds.second = event->window.data2;
+                    break;
+                case SDL_WINDOWEVENT_HIDDEN:
+                    g_CatLogging.log("Window Hidden");
+                    break;
+                case SDL_WINDOWEVENT_MINIMIZED:
+                    g_CatLogging.log("Window Minimized");
+                    break;
+                }
                 break;
             }
         }

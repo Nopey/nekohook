@@ -66,8 +66,8 @@ SharedObject::SharedObject(const char* _file_name) : file_name(_file_name) {
 	auto path = LocateSharedObject(_file_name);
 	// Check if we didnt get anything from above, if so retry the above untill we get something
 	while (path.empty()) {
-		g_CatLogging.log("Didnt find shared object: %s, Retrying!", _file_name);
-		std::this_thread::sleep_for(std::chrono::milliseconds(250));
+		g_CatLogging.log("Couldn't find shared object: %s, Retrying!", _file_name);
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		path = LocateSharedObject(_file_name);
 	}
 	g_CatLogging.log("Shared object Path: %s -> \"%s\"", _file_name, path.c_str());

@@ -9,9 +9,14 @@
 #pragma once
 
 #include "base/CBaseRoot.hpp"
+#include "../util/catvars.hpp"
 
 namespace gui {
 
 extern base::CBaseRoot g_pGui;
+extern CatVarKey activatekey;
+extern CatVarKey backkey;
+extern CatVarKey nextkey;
+extern CatVarKey prevkey;
 
 }
