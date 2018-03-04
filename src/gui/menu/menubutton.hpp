@@ -6,9 +6,6 @@ namespace gui { namespace menu {
 class CMenuButton : public base::CBaseWidget {
 public:
   CMenuButton(const char *);
-  std::vector<int> menu_position = {0};
-  virtual void OnMouseEnter();
-  virtual void OnMouseLeave();
   virtual bool TryFocusGain();
   virtual void OnFocusLose();
   virtual void OnKeyPress(int);
@@ -20,7 +17,9 @@ public:
   virtual void Update();
 
   void SetChild(IWidget *);
+  //Only really relevant to keyboard input.
   bool child_focused=false;
-  IWidget* child;
+  IWidget* child=nullptr;
+  std::pair<int,int> padding=std::make_pair(3,3);
 };
 }}

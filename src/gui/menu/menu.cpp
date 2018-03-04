@@ -9,6 +9,7 @@
 #include "../../util/logging.hpp"
 #include "../gui.hpp"
 
+#include "../base/CBaseTitleBar.hpp"
 #include "menu.hpp"
 #include "menubutton.hpp"
 #include <sstream>
@@ -19,43 +20,35 @@
 
 namespace gui { namespace menu {
 
-CMenu pMenu("Menu Root");
+base::CBaseWindow pMenu("Menu Root");
 
-void populateMenu(CMenu *menu, CatMenuTree &branch, unsigned int depth=0){
-  g_CatLogging.log(" cc %d c %d",branch.cat_children.size(),branch.children.size());
-  for(auto child:branch.cat_children){
-    g_CatLogging.log(" + %s", child->name.c_str());
-    CMenuButton *button=new CMenuButton(child->name.c_str());
-    button->size = std::make_pair(30, 40);
-    menu->AddChild(button);
-  }
+void populateMenu(base::CBaseContainer *parent, CatMenuTree &branch, unsigned int depth=0){
   for(auto& child:branch.children){
-    g_CatLogging.log("[ %s", child.name.c_str());
     CMenuButton *button=new CMenuButton(child.name.c_str());
-    button->size = std::make_pair(30, 40);
-    menu->AddChild(button);
+    parent->AddChild(button);
     CMenu *childMenu = new CMenu(child.name.c_str());
-    childMenu->position_mode = base::FLOATING;
-    childMenu->size = std::make_pair(200, 400);
     button->SetChild(childMenu);
     populateMenu(childMenu, child, depth+1);
-    g_CatLogging.log("] %s", child.name.c_str());
+  }
+  for(auto child:branch.cat_children){
+    CMenuButton *button=new CMenuButton(child->name.c_str());
+    parent->AddChild(button);
   }
 }
-CMenu::CMenu(const char * str):CBaseWindow(str){}
+CMenu::CMenu(const char * str):CBaseWindow(str){
+  hover_is_focus=true;
+  position_mode = base::FLOATING;
+}
 
 void CMenu::Update() {
   offset = std::make_pair(parent->size.first,0);
-  if(focus){
-
-  }
   CBaseWindow::Update();
 }
 
 void Init() {
-  pMenu.position_mode = base::FLOATING;
-  pMenu.size = std::make_pair(200, 400);
   g_pGui.AddChild(&pMenu);
+  base::CBaseTitleBar *title=new base::CBaseTitleBar("Menu");
+  pMenu.AddChild(title);
   populateMenu(&pMenu,CatMenuRoot);
   
   std::stringstream ss;

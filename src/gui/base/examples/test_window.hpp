@@ -21,9 +21,9 @@ CExampleWindow() : CBaseWindow("example_window") {
   AddChild(new CBaseTitleBar("Title"));
   auto ibox = new CBaseInfoBox("info", "This is an example infobox!");
   AddChild(ibox);
-  ibox->max_size = std::make_pair(20,400);
-  offset = std::make_pair(20,400);
-	max_size = std::make_pair(1024,768);
+  ibox->minmax_size = std::make_pair(20,400);
+  offset = std::make_pair(300,400);
+	//minmax_size = std::make_pair(1024,768);
 }
 
 };

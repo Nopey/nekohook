@@ -18,7 +18,7 @@ public:
   virtual void Update();
 };
 
-extern CMenu pMenu;
+extern base::CBaseWindow pMenu;
 void Init();
 
 }}

@@ -22,14 +22,6 @@ CatMenuTree CatMenuRoot;
 
 // Menu tree
 void CatMenuTree::AddTree(CatVar* cat_var, int recursions) {
-  if(recursions==0){
-	std::string str;
-    for(auto i : cat_var->gui_position){
-	  str+=i+" -> ";
-	}
-	str+=cat_var->name;
-	g_CatLogging.log("%s",str.c_str());
-  }
   // Check if we reached the end if the enum info, if not we can add more to the tree
   if (cat_var->gui_position.size() <= recursions) {
     cat_children.push_back(cat_var); // We finished recursing

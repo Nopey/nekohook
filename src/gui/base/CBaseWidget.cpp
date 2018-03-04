@@ -25,7 +25,10 @@ CBaseWidget::CBaseWidget(const char* _name) {
 
 // General functions
 void CBaseWidget::Update() {}
-void CBaseWidget::Draw() {}
+void CBaseWidget::Draw() {
+	//TODO: Remove hover debug
+	//if(hover) DrawBounds();
+}
 void CBaseWidget::DrawBounds() {
 	//If the bounds color is unset
 	if (bounds_color == CatVector4())
@@ -52,7 +55,7 @@ void CBaseWidget::Show() { visible = true; }
 void CBaseWidget::Hide() { visible = false; }
 
 // Sizing
-//TODO: Optimization: Have parent pass own absolute position to child.
+//TODO: Optimization: Have parent pass own absolute position to child at drawtime
 std::pair<int, int> CBaseWidget::AbsolutePosition() {
 	auto result = offset;
 	auto pParent = parent;

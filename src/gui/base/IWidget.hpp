@@ -38,8 +38,8 @@ public:
 	// Positioning
 	int position_mode = FLOATING;
 	std::pair<int, int> offset;
-	std::pair<int, int> size;
-	std::pair<int, int> max_size = std::make_pair(-1, -1);
+	std::pair<int, int> size = std::make_pair(0, 0);
+	std::pair<int, int> minmax_size = std::make_pair(-1, -1); //Max size on things like tooltip or infobox, min size when dealing with containers.
 
 	int zindex = 0;
 
@@ -71,6 +71,7 @@ public:
 	// Visibility
 	virtual void Show() = 0;
 	virtual void Hide() = 0;
+	//TODO: Consider using parent->IsVisible()
 	bool IsVisible() { return always_visible || parent ? parent->visible && visible : visible; }
 
 	// Sizing

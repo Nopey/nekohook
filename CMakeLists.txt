@@ -18,6 +18,7 @@ set(CGAME tf2 CACHE STRING "Game to build with")
 set(CGFX valve_surface CACHE STRING "Graphics module to use")
 set(CUSEDUMBSTRING false CACHE BOOL "Use Dummy string gfx?")
 set(CINP xlib CACHE STRING "Input module to use")
+#TODO: CUSERNAME
 set(CUSERNAME UNREGISTERED CACHE STRING "Register a username")
 set(CUSERID 0 CACHE STRING "Register a id")
 set(CForceClang false CACHE STRING "Should cmake force compilation with cmake?")

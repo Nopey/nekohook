@@ -17,7 +17,7 @@ namespace gui { namespace base {
 CBaseRoot::CBaseRoot() : CBaseContainer("Root") {
 	/*tooltip_widget = new CBaseInfoBox("tooltip");
 	tooltip_widget->position_mode = FLOATING;
-	tooltip_widget->max_size = std::make_pair(200, 180);
+	tooltip_widget->minmax_size = std::make_pair(200, 180);
 	AddChild(tooltip_widget);*/
 }
 
@@ -71,7 +71,7 @@ void CBaseRoot::Update() {
   frame_count++;
 */
   // Update tick to elements
-  max_size = input::bounds;
+  minmax_size = input::bounds;
   CBaseContainer::Update();
 
   // Draw
