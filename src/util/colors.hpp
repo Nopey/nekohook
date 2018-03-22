@@ -54,10 +54,6 @@ const CatVector4 green 	= CatVector4(0, 255, 0, 255);
 const CatVector4 gray   = CatVector4(100, 100, 100, 255);
 const CatVector4 empty 	= CatVector4(0, 0, 0, 0);
 
-//Extra colors, just because.
-const CatVector4 lightgray = CatVector4(180, 180, 180, 255);
-const CatVector4 darkgray = CatVector4(50, 50, 50, 255);
-
 // Color functions
 extern CMFunction<CatVector4(CatEntity*)> EntityColor;
 

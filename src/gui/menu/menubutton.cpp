@@ -13,7 +13,7 @@ namespace gui { namespace menu {
 CMenuButton::CMenuButton(std::string str):CBaseParent(str){
 }
 void CMenuButton::Draw(){
-    auto color=focus?(focused_child==-1?colors::pink:colors::RainbowCurrent()):(hover?colors::lightgray:colors::gray);
+    auto color=focus?(focused_child==-1?colors::pink:colors::RainbowCurrent()):(hover?colors::black:colors::gray);
     draw::RectFilled(global_pos.first, global_pos.second, size.first, size.second, colors::Transparent(color, 0.3));
     draw::Rect(global_pos.first, global_pos.second, size.first, size.second, color);
     auto textsize=draw::GetStringLength(name.c_str(),draw::default_font.value,draw::default_font_size.value);

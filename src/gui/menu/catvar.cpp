@@ -16,7 +16,7 @@ namespace gui { namespace menu {
     CCatVar::CCatVar(CatVar * cv):CBaseWidget(cv->name), cv(cv){
     }
     void CCatVar::Draw(){
-        auto color=focus?(typing?colors::pink:colors::RainbowCurrent()):(hover?colors::lightgray:colors::gray);
+        auto color=focus?(typing?colors::pink:colors::RainbowCurrent()):(hover?colors::black:colors::gray);
     	draw::RectFilled(global_pos.first, global_pos.second, size.first, size.second, colors::Transparent(color, 0.3));
     	draw::Rect(global_pos.first, global_pos.second, size.first, size.second, color);
         auto textsize=draw::GetStringLength(cv->desc_short.c_str(),draw::default_font.value,draw::default_font_size.value);
