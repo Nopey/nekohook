@@ -14,7 +14,7 @@
 
 namespace gui { namespace sidestrings {
 
-HudString SideStrings(8, 8);// Stores side strings
+HudString SideStrings(8, 66);// Stores side strings
 
 // The main string to use at the top
 inline const std::string top_string(){
