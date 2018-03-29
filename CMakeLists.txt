@@ -51,7 +51,7 @@ message(STATUS "Game module: ${CGAME}")
 # Team Fortress game module
 if(CGAME STREQUAL "tf2")
 	add_definitions("-DCATHOOK_TF2=1")
-	set(CBASE "SOURCE_2013_SDK")
+  set(CBASE "SOURCE_2013_SDK")
 # Fistful of Frags game module
 elseif(CGAME STREQUAL "fof")
 	add_definitions("-DCATHOOK_FOF=1")
@@ -70,6 +70,13 @@ if(CGFX STREQUAL "valve_surface")
 elseif(CGFX STREQUAL "gl_draw")
   add_definitions("-DCATHOOK_GFX_GL=1")
   list(APPEND SOURCE_FILES "src/modules/gl_draw/gl_draw.cpp")
+  add_subdirectory(src/modules/gl_draw/libglez/)
+  include_directories(SYSTEM src/modules/gl_draw/libglez/include)
+  #TODO: I don't remember why rdynamic is needed
+  add_compile_options(-rdynamic)
+  list(APPEND LINK_LIBRARIES glez)
+  #TODO: Don't use xlib on windows!
+  set(USE_XLIB true)
 endif()
 
 ## Input modules
@@ -79,6 +86,26 @@ if(CINP STREQUAL "xlib")
 	add_definitions("-DCATHOOK_INP_XLIB=1")
   list(APPEND SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/modules/xlib/input.cpp")
   set(USE_XLIB true)
+elseif(CINP STREQUAL "sdl")
+  # TODO: Find TF2 SDL2
+  list(APPEND LINK_LIBRARIES $ENV{HOME}/.steam/steam/steamapps/common/Team\ Fortress\ 2/bin/libSDL2-2.0.so.0)
+  FIND_PATH(SDL2_INCLUDE_DIR SDL.h
+  HINTS
+  $ENV{SDL2DIR}
+  PATH_SUFFIXES include/SDL2 include
+  PATHS ~/Library/Frameworks
+	/Library/Frameworks
+	/usr/local
+	/usr
+	/sw # Fink
+	/opt/local # DarwinPorts
+	/opt/csw # Blastwave
+	/opt)
+  message("SDL Include Dir:" ${SDL2_INCLUDE_DIR})
+  include_directories(SYSTEM ${SDL2_INCLUDE_DIR})
+  add_definitions("-DCATHOOK_INP_SDL=1")
+  list(APPEND SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/modules/sdl/sdl.cpp")
+  set(USE_SDL true)
 endif()
 
 ## SDK/Bases if needed
@@ -95,6 +122,11 @@ if(USE_XLIB)
   list(APPEND SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/modules/xlib/xlib.cpp")
 endif()
 
+# If anything uses sdl, we need the main file
+if(USE_SDL)
+  list(APPEND SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/modules/sdl/sdl.cpp")
+endif()
+
 # Default compiler flags
 set(CMAKE_CXX_FLAGS_DEBUG "${CCOMMON_FLAGS} -g3 -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "${CCOMMON_FLAGS} -s -mtune=generic -O3")
@@ -109,4 +141,4 @@ endforeach()
 #include_directories(${INCLUDE_DIRS})
 add_library(nekohook SHARED ${EARLY_SOURCE_FILES} ${SOURCE_FILES})
 
-target_link_libraries(nekohook c stdc++)
+target_link_libraries(nekohook c stdc++ ${LINK_LIBRARIES})
