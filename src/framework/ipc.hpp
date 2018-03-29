@@ -2,7 +2,9 @@
 #include <thread> // Threads are useful!
 #include <vector>
 
+
 #include "../util/chrono.hpp" // for the cat timer, and so we can sleep in thread
+#include "../util/functions.hpp"
 
 // Increase as needed, we just need enough space to handle
 #define MAX_IPC_MEMBERS 32
@@ -25,7 +27,7 @@ struct IpcSlot {
 };
 // A message, it is the recipients job to recieve it in time and reset it
 struct IpcMessage : public IpcSlot {
-  int author; // number in array
+  int author; // number in member array
   int recipient;
   char command[64]; // A command that tells the recipient what to do with the payload
   char payload[1024]; // This could be anything
@@ -37,6 +39,15 @@ struct IpcMember : public IpcSlot {
 struct IpcContent {
   IpcMember members[MAX_IPC_MEMBERS];
   IpcMessage message_pool[MAX_IPC_MESSAGE_CAP];
+};
+
+// IPC command handler
+class IpcCommand {
+public:
+  IpcCommand(const char* name, void(*_com_callback)(const IpcMessage* payload));
+  inline void operator()(const IpcMessage* message){com_callback(message);}
+private:
+  CMFunction<void(const IpcMessage*)> com_callback;
 };
 
 // IPC Driver
@@ -58,44 +69,44 @@ public:
 // Setters/Getters
 public:
   // Used to get a list of members
-  inline std::vector<std::string> GetMembers() {
+  inline std::vector<std::string> GetMembers() const {
     std::vector<std::string> ret;
-    if (!this->IpcMemSpace)// Saftey net
-      return ret;
-    for (auto i: this->IpcMemSpace->members)
-      ret.push_back(i.name);
+    for (const auto& i: this->IpcMemSpace->members)
+      if (i.state == ipc_state::RECIPIENT_LOCKED)
+        ret.push_back(i.name);
     return ret;
   }
   // Returns the name used in ipc
-  inline std::string GetIpcName() {
-    if (!this->IpcMemSpace || ipc_pos == -1) return std::string();
+  inline std::string GetIpcName() const {
+    if (ipc_pos == -1) return std::string();
     return this->IpcMemSpace->members[ipc_pos].name;
   }
   // Returns whether member exists
-  inline bool MemberExists(const std::string& test_name) {
+  inline bool MemberExists(const std::string& test_name) const {
     return (FindMember(test_name) == -1) ? false : true;
   }
   // Returns the slot of the member, returns -1 on failure
-  inline int FindMember(const std::string& test_name) {
+  inline int FindMember(const std::string& test_name) const {
     for (int i = 0; i < MAX_IPC_MEMBERS; i++)
-      if (this->IpcMemSpace->members[i].name == test_name)
-        return i;
+      if (this->IpcMemSpace->members[i].state == ipc_state::RECIPIENT_LOCKED) // we only want members that arent locked
+        if (this->IpcMemSpace->members[i].name == test_name)
+          return i;
     return -1;
   }
 private:
   // Internal cleanup of the ipc space, in the case of a member not being nice >:(
   inline void IpcCleanup(){
     // For the cleanup, we look for anything not open and check the timer on it
-    // We clean thing more than 3 seconds of idle
-    for (auto i : this->IpcMemSpace->members)
-      if (i.state != ipc_state::OPEN && i.time.CheckTime(std::chrono::seconds(3)))
+    // We clean thing more than 6 seconds of idle
+    for (auto& i : this->IpcMemSpace->members)
+      if (i.state != ipc_state::OPEN && i.time.CheckTime(std::chrono::seconds(6)))
         i.state = ipc_state::OPEN;
-    for (auto i : this->IpcMemSpace->message_pool)
-      if (i.state != ipc_state::OPEN && i.time.CheckTime(std::chrono::seconds(3)))
+    for (auto& i : this->IpcMemSpace->message_pool)
+      if (i.state != ipc_state::OPEN && i.time.CheckTime(std::chrono::seconds(6)))
         i.state = ipc_state::OPEN;
   }
   // Internal use for finding open slots, be sure to give it the right size to prevent segfaults
-  inline int GetOpenSlot(IpcSlot* slot_array, int size){
+  inline int GetOpenSlot(IpcSlot* slot_array, int size) const {
     for (int i = 0; i < size; i++)
       if (slot_array[i].state == ipc_state::OPEN)
         return i;
@@ -110,9 +121,12 @@ private:
   void thread_loop();
 public:
   // Use to send messages through ipc, use member pos or by name, returns true on success
-  bool SendMessage(std::string recipient, const char* command, const void* payload, size_t size);
+  bool SendMessage(const std::string& recipient, const char* command, const void* payload, size_t size);
   bool SendMessage(int recipient, const char* command, const void* payload, size_t size);
   void SendAll(const char* command, const void* payload, size_t size);
 };
+
+// not garrenteed to not be null, check before using it
+extern IpcStream* g_IpcStream;
 
 }
