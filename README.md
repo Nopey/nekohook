@@ -16,12 +16,7 @@ Nekohook is currently VAC undetected!
 
 # Installation
 ```bash
-git clone --recursive https://github.com/oneechanhax/nekohook && cd nekohook && ./build
-```
-
-## Updating
-```bash
-./update
+git clone --recursive https://github.com/oneechanhax/nekohook && cd nekohook && ./build-linux.sh
 ```
 
 ## Injecting
@@ -32,5 +27,5 @@ git clone --recursive https://github.com/oneechanhax/nekohook && cd nekohook && 
 
 ### Backtrace
 ```bash
-./attach-backtrace
+./attach -b
 ```
